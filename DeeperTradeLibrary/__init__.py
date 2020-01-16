@@ -42,10 +42,10 @@ class Backtest:
         #Create trading result
         df_trade = pd.DataFrame({
             'type' : df.groupby('value_grp').signal.first(),
-            'open_time':df.groupby('value_grp').openTime.first(),
+            'open_time':df.groupby('value_grp').open_time.first(),
             'open_price' : df.groupby('value_grp').close.first(),
-            'close_time' : df.groupby('value_grp').closeTime.last(),
-            'close_price' : df.groupby('value_grp').closePrice.last(),
+            'close_time' : df.groupby('value_grp').close_time.last(),
+            'close_price' : df.groupby('value_grp').close_price.last(),
             'length' : df.groupby('value_grp').size(),
         })
         df_trade['pnl'] = (df_trade.close_price-df_trade.open_price)*df_trade.type*10**digit*pip_profit-commission
