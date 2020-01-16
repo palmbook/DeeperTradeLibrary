@@ -15,7 +15,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="DeeperTradeLibrary",
-    version="0.0.1",
+    version="0.0.2",
     author="Chakrit Yau",
     author_email="chakrity@deepertrade.com",
     description="Feature Engineering Tools for DeeperTrade",

@@ -24,3 +24,35 @@ class Indicators:
         df['kurtosis'] = pandas_ta.kurtosis(df['close'], length=30)
         
         return df
+        
+class Backtest:
+    @staticmethod
+    def trade_simulation(df,digit=1,pip_profit=1,commission=0):
+    
+        assert 'signal' in df.columns, 'Signal column is required.'
+
+        df['value_grp'] = (df.signal != df.signal.shift(1)).astype('int').cumsum()
+        df['open_time'] = df.time
+        df['close_time'] =  df.time.shift(-1)
+        df['open_price'] = df.close
+        df['close_price'] = df.close.shift(-1)
+        #Remove last signal.
+        df = df[df['value_grp']!=df.iloc[-1].value_grp]
+        
+        #Create trading result
+        df_trade = pd.DataFrame({
+            'type' : df.groupby('value_grp').signal.first(),
+            'open_time':df.groupby('value_grp').openTime.first(),
+            'open_price' : df.groupby('value_grp').close.first(),
+            'close_time' : df.groupby('value_grp').closeTime.last(),
+            'close_price' : df.groupby('value_grp').closePrice.last(),
+            'length' : df.groupby('value_grp').size(),
+        })
+        df_trade['pnl'] = (df_trade.close_price-df_trade.open_price)*df_trade.type*10**digit*pip_profit-commission
+        df_trade = df_trade[df_trade.type!=0]
+        df_trade['equity'] = df_trade.pnl.cumsum()
+        
+        df_trade.reset_index(drop=True, inplace=True)
+        
+        return df_trade
+        
