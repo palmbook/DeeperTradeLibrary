@@ -55,4 +55,44 @@ class Backtest:
         df_trade.reset_index(drop=True, inplace=True)
         
         return df_trade
+    
+    @staticmethod
+    def stock_trade_simulation(df, shares=1, commission=0.5, vat=7.0):
+
+        assert 'time' in df.columns, '\'time\' column is required.'
+        assert 'open' in df.columns, '\'open\' column is required.'
+        assert 'high' in df.columns, '\'high\' column is required.'
+        assert 'low' in df.columns, '\'low\' column is required.'
+        assert 'close' in df.columns, '\'close\' column is required.'
+        assert 'signal' in df.columns, '\'signal\' column is required.'
+
+        df = df.copy()
+        
+        df['value_grp'] = (df.signal != df.signal.shift(1)).astype('int').cumsum()
+        df['open_time'] = df.time
+        df['close_time'] =  df.time.shift(-1)
+        df['open_price'] = df.close
+        df['close_price'] = df.close.shift(-1)
+        #Remove last signal.
+        df = df[df['value_grp']!=df.iloc[-1].value_grp]
+
+        #Create trading result
+        df_trade = pd.DataFrame({
+            'type' : df.groupby('value_grp').signal.first(),
+            'open_time':df.groupby('value_grp').open_time.first(),
+            'open_price' : df.groupby('value_grp').close.first(),
+            'close_time' : df.groupby('value_grp').close_time.last(),
+            'close_price' : df.groupby('value_grp').close_price.last(),
+            'length' : df.groupby('value_grp').size(),
+        })
+        df_trade['shares'] = shares
+        df_trade['profit'] = (df_trade.close_price - df_trade.open_price) * shares
+        df_trade['commission'] = round((df_trade.open_price * shares * (commission / 100)) * (vat / 100), 2)
+        df_trade['pnl'] = df_trade.profit - df_trade.commission
+        df_trade = df_trade[df_trade.type==1]
+        df_trade['equity'] = df_trade.pnl.cumsum()
+
+        df_trade.reset_index(drop=True, inplace=True)
+
+        return df_trade
         
