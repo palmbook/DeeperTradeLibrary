@@ -27,6 +27,7 @@ class Indicators:
 
 class Tools:
     
+    @staticmethod
     def _timeframe_resampler(dt):
         if len(dt)!=0:
             if dt.name=='open': return dt.values[0]
@@ -53,7 +54,7 @@ class Tools:
         dfr['time'] = dfr.index
         dfr = dfr[df.columns]
         dfr.reset_index(drop=True, inplace=True)
-        
+
         return dfr
         
 class Backtest:
