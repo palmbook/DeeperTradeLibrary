@@ -27,8 +27,8 @@ class Indicators:
 
 class Tools:
     
-    @staticmethod
-    def _timeframe_resampler(dt):
+    #@staticmethod
+    def _timeframe_resampler(self, dt):
         if len(dt)!=0:
             if dt.name=='open': return dt.values[0]
             elif dt.name=='high': return dt.max()
@@ -50,7 +50,7 @@ class Tools:
         dfp = df.copy()
         dfp['time'] = pd.to_datetime(dfp.time)
         dfp.set_index('time', inplace=True)
-        dfr = dfp.resample(timeframe).apply(_timeframe_resampler).dropna()
+        dfr = dfp.resample(timeframe).apply(Tools._timeframe_resampler).dropna()
         dfr['time'] = dfr.index
         dfr = dfr[df.columns]
         dfr.reset_index(drop=True, inplace=True)
