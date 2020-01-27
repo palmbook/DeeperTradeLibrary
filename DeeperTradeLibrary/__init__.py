@@ -24,6 +24,37 @@ class Indicators:
         df['kurtosis'] = pandas_ta.kurtosis(df['close'], length=30)
         
         return df
+
+class Tools:
+    
+    def _timeframe_resampler(dt):
+        if len(dt)!=0:
+            if dt.name=='open': return dt.values[0]
+            elif dt.name=='high': return dt.max()
+            elif dt.name=='low': return dt.min()
+            elif dt.name=='close': return dt.values[-1]
+            elif dt.name=='volume': return dt.sum()
+        else:
+            return np.nan
+
+    @staticmethod
+    def timeframe_resampler(df, timeframe='1D'):
+        #Columns Check
+        assert 'time' in df.columns, '\'time\' column is required.'
+        assert 'open' in df.columns, '\'open\' column is required.'
+        assert 'high' in df.columns, '\'high\' column is required.'
+        assert 'low' in df.columns, '\'low\' column is required.'
+        assert 'close' in df.columns, '\'close\' column is required.'
+        #Processing
+        dfp = df.copy()
+        dfp['time'] = pd.to_datetime(dfp.time)
+        dfp.set_index('time', inplace=True)
+        dfr = dfp.resample(timeframe).apply(_timeframe_resampler).dropna()
+        dfr['time'] = dfr.index
+        dfr = dfr[df.columns]
+        dfr.reset_index(drop=True, inplace=True)
+        
+        return dfr
         
 class Backtest:
     @staticmethod
