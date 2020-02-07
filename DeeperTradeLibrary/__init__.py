@@ -38,7 +38,9 @@ class API:
         r = requests.get(url, headers=header, params=payload)
         if r.status_code == 200:
             return pd.DataFrame(r.json()['data'])
-        else : return None
+        else :
+            print(r.json())
+            return None
 class Tools:
     
     @staticmethod
