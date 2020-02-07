@@ -5,6 +5,7 @@ import pandas as pd
 
 import ta
 import pandas_ta
+import requests
 
 class Indicators:
     @staticmethod
@@ -25,10 +26,23 @@ class Indicators:
         
         return df
 
+class API:
+    @staticmethod
+    def get_instrument_data(token, country, instrument, timeframe='D1', length=100):
+        url = 'https://deepertrade.azure-api.net/instruments/%s/%s/data' % (country, instrument)
+        header = { 'Authorization':'Bearer ' + token }
+        payload = {
+            "Timeframe": timeframe,
+            "Length" : length
+        }
+        r = requests.get(url, headers=header, params=payload)
+        if r.status_code == 200:
+            return pd.DataFrame(r.json()['data'])
+        else : return None
 class Tools:
     
     @staticmethod
-    def timeframe_resampler_candle(dt):
+    def timeframe_resampler_candle(self, dt):
         if len(dt)!=0:
             if dt.name=='open': return dt.values[0]
             elif dt.name=='high': return dt.max()
@@ -50,7 +64,7 @@ class Tools:
         dfp = df.copy()
         dfp['time'] = pd.to_datetime(dfp.time)
         dfp.set_index('time', inplace=True)
-        dfr = dfp.resample(timeframe).apply(timeframe_resampler_candle).dropna()
+        dfr = dfp.resample(timeframe).apply(self.timeframe_resampler_candle).dropna()
         dfr['time'] = dfr.index
         dfr = dfr[df.columns]
         dfr.reset_index(drop=True, inplace=True)
