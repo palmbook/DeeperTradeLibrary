@@ -42,6 +42,12 @@ class API:
             print(r.json())
             return None
 class Tools:
+
+    @staticmethod
+    def line_notify(token, message=''):
+        url = 'https://notify-api.line.me/api/notify'
+        headers = {'content-type':'application/x-www-form-urlencoded','Authorization':'Bearer ' + token}
+        requests.post(url, headers = headers, data = {'message': message})
     
     @staticmethod
     def timeframe_resampler_candle(self, dt):
