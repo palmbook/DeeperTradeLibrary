@@ -28,13 +28,15 @@ class Indicators:
 
 class API:
     @staticmethod
-    def get_instrument_data(token, country, instrument, timeframe='D1', length=100):
+    def get_instrument_data(token, country, instrument, timeframe='D1', length=100, From=None, To=None):
         url = 'https://deepertrade.azure-api.net/instruments/%s/%s/data' % (country, instrument)
         header = { 'Authorization':'Bearer ' + token }
         payload = {
             "Timeframe": timeframe,
             "Length" : length
         }
+        if From is not None: payload['From'] = From
+        if To is not None: payload['To'] = To
         r = requests.get(url, headers=header, params=payload)
         if r.status_code == 200:
             return pd.DataFrame(r.json()['data'])
