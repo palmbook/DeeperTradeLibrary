@@ -29,7 +29,7 @@ class Indicators:
 class API:
     @staticmethod
     def get_instrument_data(token, country, instrument, timeframe='D1', length=100, From=None, To=None, IncludeFirst=True):
-        url = 'https://deepertrade.azure-api.net/instruments/%s/%s/data' % (country, instrument)
+        url = 'https://api.deepertrade.co/instruments/%s/%s/data' % (country, instrument)
         header = { 'Authorization':'Bearer ' + token }
         payload = {
             "Timeframe": timeframe,
