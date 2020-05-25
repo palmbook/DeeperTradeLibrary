@@ -40,7 +40,7 @@ class API:
         if To is not None: payload['To'] = To
         r = requests.get(url, headers=header, params=payload)
         if r.status_code == 200:
-            return pd.DataFrame(r.json()['data'])
+            return pd.DataFrame(r.json()['Data'])
         else :
             print(r.json())
             return None
